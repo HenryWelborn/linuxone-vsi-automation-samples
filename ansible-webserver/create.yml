@@ -30,22 +30,23 @@
         cacheable: True
         vpc: "{{ vpc_create_output.resource }}"
 
-    - name: Create VPC Subnet
-      when: subnet is undefined
+    - name: Create VPC Subnets
+      when: subnet_dict is undefined
       ibm_is_subnet:
-        name: "{{ lookup('vars',vpc_name).subnet }}"
+        name: "{{ item.name }}"
         state: available
-        id: "{{ subnet.id | default(omit) }}"
         vpc: "{{ vpc.id }}"
         total_ipv4_address_count: "{{ total_ipv4_address_count }}"
-        zone: "{{ zone }}"
+        zone: "{{ item.zone }}"
       register: subnet_create_output
+      loop: "{{ lookup('vars',vpc_name).subnets }}"
 
-    - name: Save VPC Subnet as fact
-      when: subnet is undefined
+    - name: Save VPC Subnets as facts
+      when: subnet_create_output is defined
       set_fact:
         cacheable: True
-        subnet: "{{ subnet_create_output.resource }}"
+        subnet_dict: "{{ subnet_dict | default({}) | combine ({item.resource.zone: item.resource.id }) }}"
+      with_items: "{{ subnet_create_output.results }}"
 
     - name: Upload SSH Key
       when: ssh_key is undefined
@@ -85,7 +86,7 @@
         keys:
           - "{{ ssh_key.id }}"
         primary_network_interface:
-          - subnet: "{{ subnet.id }}"
+          - subnet: "{{ subnet_dict[zone] }}"
         zone: "{{ zone }}"
       register: vsi_create_output
 

@@ -23,7 +23,7 @@
         keys:
           - "{{ ssh_key.id }}"
         primary_network_interface:
-          - subnet: "{{ subnet.id }}"
+          - subnet: "{{ subnet_dict[zone] }}"
         zone: "{{ zone }}"
       when: vsi is defined
 
@@ -33,11 +33,12 @@
     #     id: "{{ ssh_key.id }}"
     #   when: ssh_key is defined
 
-    # - name: Remove VPC Subnet
+    # - name: Remove VPC Subnets
     #   ibm_is_subnet:
     #     state: absent
-    #     id: "{{ subnet.id }}"
-    #   when: subnet is defined
+    #     id: "{{ item.value }}"
+    #   loop: "{{ subnet_dict|dict2items }}"
+    #   when: subnet_dict is defined
 
     # - name: Remove VPC
     #   ibm_is_vpc:
