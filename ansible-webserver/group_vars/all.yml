@@ -1,7 +1,13 @@
 
 ---
-# Name prefix for the created objects (VPC, subnetwork, VSI)
-name_prefix: zlinux-ansible
+# Name for the VPC
+vpc_name: zlinux-ansible
+
+# Name for the components for the VPC created objects (VPC, subnetwork, VSI)
+zlinux-ansible:
+  subnet: "{{ vpc_name }}-{{ zone }}"
+  vsi: "{{ vpc_name }}-vsi"
+  fip: "{{ vpc_name }}-fip"
 
 # Regular expresion for the VSI image name
 # If multiple matches are found the first one is taken
