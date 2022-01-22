@@ -27,21 +27,21 @@
         zone: "{{ zone }}"
       when: vsi is defined
 
-    # - name: Remove SSH Key
-    #   ibm_is_ssh_key:
-    #     state: absent
-    #     id: "{{ ssh_key.id }}"
-    #   when: ssh_key is defined
+    - name: Remove SSH Key
+      ibm_is_ssh_key:
+        state: absent
+        id: "{{ ssh_key.id }}"
+      when: (ssh_key is defined) and (destroy_ssh_key is true)
 
-    # - name: Remove VPC Subnets
-    #   ibm_is_subnet:
-    #     state: absent
-    #     id: "{{ item.value }}"
-    #   loop: "{{ subnet_dict|dict2items }}"
-    #   when: subnet_dict is defined
+    - name: Remove VPC Subnets
+      ibm_is_subnet:
+        state: absent
+        id: "{{ item.value }}"
+      loop: "{{ subnet_dict|dict2items }}"
+      when: (subnet_dict is defined) and (destroy_vpc is true)
 
-    # - name: Remove VPC
-    #   ibm_is_vpc:
-    #     state: absent
-    #     id: "{{ vpc.id }}"
-    #   when: vpc is defined
+    - name: Remove VPC
+      ibm_is_vpc:
+        state: absent
+        id: "{{ vpc.id }}"
+      when: (vpc is defined) and (destroy_vpc is true)

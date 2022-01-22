@@ -20,6 +20,8 @@
 ## Destroy
 
 1. `ansible-playbook destroy.yml`
-   - Note: VPC and subnetwork will not be deleted - comment in last two tasks in
-     [destroy.yml](destroy.yml) if you want them deleted.
+   - Note: VPC and subnetworks will not be deleted by default - change the `destroy_vpc` value in
+     [ansible settings](group_vars/all.yml) if you want them deleted.
+   - Note: the SSH public key will not be deleted by default - change the `destroy_ssh_key` value in
+     [ansible settings](group_vars/all.yml) if you want it deleted.
 2. Delete `.cache` folder

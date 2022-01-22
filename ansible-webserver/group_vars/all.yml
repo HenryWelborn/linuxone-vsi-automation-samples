@@ -39,3 +39,11 @@ zone: "{{region}}-1"
 # If cache_vsi=True then VSI creation will only be attemped if not cached
 #cache_vsi: True
 cache_vsi: False
+
+# If destroy_ssh_key is enabled then the destroy playbook will delete the ssh key
+# destroy_ssh_key: True
+destroy_ssh_key: False
+
+# If destroy_vpc is enabled then the destroy playbook will delete the subnets and the vpc
+# destroy_vpc: True
+destroy_vpc: False
