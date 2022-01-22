@@ -8,6 +8,8 @@ zlinux-ansible:
   subnet: "{{ vpc_name }}-{{ zone }}"
   vsi: "{{ vpc_name }}-vsi"
   fip: "{{ vpc_name }}-fip"
+  web_firewall_group: "{{ vpc_name }}-web-fw"
+
 
 # Regular expresion for the VSI image name
 # If multiple matches are found the first one is taken

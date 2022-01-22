@@ -13,21 +13,16 @@
         state: available
         id: "{{ vpc.id | default(omit) }}"
       register: vpc_create_output
-
-    - name: Configure Security Group Rule to open SSH and web server on the VSI
+    - name: Configure Security Group Rule to open SSH by default
       when: vpc is undefined
       ibm_is_security_group_rule:
         state: available
         group: "{{ vpc_create_output.resource.default_security_group }}"
         direction: inbound
         remote: 0.0.0.0/0
-        # tcp:
-        #   - port_max: 22
-        #     port_min: 22
-        #   - port_max: 80
-        #     port_min: 80
-        #   - port_max: 443
-        #     port_min: 443
+        tcp:
+         - port_max: 22
+           port_min: 22
 
     - name: Save VPC as fact
       when: vpc is undefined
@@ -93,6 +88,49 @@
           - subnet: "{{ subnet.id }}"
         zone: "{{ zone }}"
       register: vsi_create_output
+
+    - name: Create a security group for the web server traffic
+      when: security_group is undefined
+      ibm_is_security_group:
+         state: available
+         name: "{{ lookup('vars',vpc_name).web_firewall_group }}"
+         vpc: "{{ vpc.id }}"
+      register: security_group_create_output
+
+    - name: Configure Security Group Rule to web server port 80 on the VSI
+      when: security_group is undefined
+      ibm_is_security_group_rule:
+         state: available
+         group: "{{ security_group_create_output.resource.id }}"
+         direction: inbound
+         remote: 0.0.0.0/0
+         tcp:
+          - port_max: 80
+            port_min: 80
+
+    - name: Configure Security Group Rule to web server port 443 on the VSI
+      when: security_group is undefined
+      ibm_is_security_group_rule:
+         state: available
+         group: "{{ security_group_create_output.resource.id }}"
+         direction: inbound
+         remote: 0.0.0.0/0
+         tcp:
+          - port_max: 443
+            port_min: 443
+
+    - name: Save security group as fact
+      when: security_group is undefined
+      set_fact:
+         cacheable: True
+         security_group: "{{ security_group_create_output.resource }}"
+
+    - name: assign the web server security group to the VSI
+      when: (vsi is undefined) or (cache_vsi is false)
+      ibm_is_security_group_network_interface_attachment:
+        network_interface: "{{ vsi_create_output.resource.primary_network_interface[0].id }}"
+        security_group: "{{ security_group.id }}"
+        state: available
 
     - name: Save VSI as fact
       when: (vsi is undefined) or (cache_vsi is false)
