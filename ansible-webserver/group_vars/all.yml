@@ -10,7 +10,11 @@ zlinux-ansible:
     zone: "{{region}}-1"
   vsi: "{{ vpc_name }}-vsi"
   fip: "{{ vpc_name }}-fip"
-  web_firewall_group: "{{ vpc_name }}-web-fw"
+  security_group:
+    name: "{{ vpc_name }}-web-fw"
+    tcp:
+    - 443
+    - 80
 
 
 # Regular expresion for the VSI image name
@@ -31,6 +35,7 @@ total_ipv4_address_count: 256
 
 # Region to deploy to
 region: "jp-tok"
+#region: "br-sao"
 #region: "eu-gb"
 
 #Zone within the region

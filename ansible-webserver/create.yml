@@ -90,15 +90,15 @@
         zone: "{{ zone }}"
       register: vsi_create_output
 
-    - name: Create a security group for the web server traffic
+    - name: Create security group for the VPC
       when: security_group is undefined
       ibm_is_security_group:
          state: available
-         name: "{{ lookup('vars',vpc_name).web_firewall_group }}"
+         name: "{{ lookup('vars',vpc_name).security_group.name }}"
          vpc: "{{ vpc.id }}"
       register: security_group_create_output
 
-    - name: Configure Security Group Rule to web server port 80 on the VSI
+    - name: Configure Security Group rules
       when: security_group is undefined
       ibm_is_security_group_rule:
          state: available
@@ -106,19 +106,9 @@
          direction: inbound
          remote: 0.0.0.0/0
          tcp:
-          - port_max: 80
-            port_min: 80
-
-    - name: Configure Security Group Rule to web server port 443 on the VSI
-      when: security_group is undefined
-      ibm_is_security_group_rule:
-         state: available
-         group: "{{ security_group_create_output.resource.id }}"
-         direction: inbound
-         remote: 0.0.0.0/0
-         tcp:
-          - port_max: 443
-            port_min: 443
+          - port_max: "{{ item }}"
+            port_min: "{{ item }}"
+      loop: "{{ lookup('vars',vpc_name).security_group.tcp }}"
 
     - name: Save security group as fact
       when: security_group is undefined
