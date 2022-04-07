@@ -82,7 +82,6 @@
       region: "{{ certificate_service_region }}"
       data:
         content: "{{ lookup('file','{{ ca.x509_certificate_file }}') }}"
-        priv_key: "{{ lookup('file','{{ ca.x509_key_file }}') }}"
 
 - when: vpnserver.common_name not in cert_dict.keys()
   block:
