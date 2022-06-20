@@ -16,12 +16,11 @@ instance-zlinux:
   image: .*ubuntu-18-04.*s390x.*
 instance-zos:
   name: "zos-vsi"
-  profile: mz2o-2x16
-  image: .*zos.*stock.*
+  profile: mz2-2x16
+  image: ibm-zos.*dev-test.*
   username: IBMUSER
   python_interpreters:
   - /usr/lpp/IBM/cyp/v3r9/pyz/bin/python3
-  - /usr/lpp/IBM/cyp/v3r8/pyz/bin/python3
 instance: "{{ lookup('vars','instance-' + os_type) }}"
 
 # Name of the uploaded key
@@ -37,6 +36,7 @@ total_ipv4_address_count: 256
 region: "jp-tok"
 #region: "eu-gb"
 #region: "br-sao"
+#region: "ca-tor"
 
 #Zone within the region
 zone: "{{region}}-1"
