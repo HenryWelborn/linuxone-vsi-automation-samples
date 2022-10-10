@@ -1,12 +1,33 @@
+
 # Create a VPC
 resource "ibm_is_vpc" "testacc_vpc" {
   name = var.vpc
 }
 
-# ssh key
+# RSA key of size 2048 bits
+resource "tls_private_key" "ssh" {
+  algorithm = "RSA"
+  rsa_bits  = 2048
+}
+
+# Write out the OpenSSH private key
+resource "local_file" "private_key" {
+  content         = tls_private_key.ssh.private_key_openssh
+  filename        = var.ssh_private_keyfile
+  file_permission = "0600"
+}
+
+# Write out the OpenSSH public key
+resource "local_file" "public_key" {
+  content         = tls_private_key.ssh.public_key_openssh
+  filename        = var.ssh_public_keyfile
+  file_permission = "0644"
+}
+
+# ssh key onto IBM Cloud
 resource "ibm_is_ssh_key" "testacc_sshkey" {
   name      = var.ssh_public_key_name
-  public_key = file(var.ssh_public_key)
+  public_key = trimspace(tls_private_key.ssh.public_key_openssh)
 }
 
 # subnetwork
@@ -51,7 +72,7 @@ locals {
 
 # vsi
 resource "ibm_is_instance" "testacc_vsi" {
-  name    = var.vsi_name
+  name    = local.randomized_vsi_name
   image   = local.image.id
   profile = local.profile
 

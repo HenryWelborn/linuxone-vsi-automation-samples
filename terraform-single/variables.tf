@@ -17,9 +17,14 @@ variable "ssh_public_key_name" {
   default = "terraform-test"
 }
 
-variable "ssh_public_key" {
-  default = "~/.ssh/id_rsa.pub"
+variable "ssh_private_keyfile" {
+  default = "terraform-test.rsa"
 }
+
+variable "ssh_public_keyfile" {
+  default = "terraform-test.rsa.pub"
+}
+
 
 variable "subnetwork_name" {
   default = "terraform-test"
